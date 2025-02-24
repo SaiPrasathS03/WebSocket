@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        #input {
+            width: 300px;
+            padding: 5px;
+        }
+    </style>
+    <script>
+        var ws;
+
+        // Open WebSocket connection when the page loads
+        window.onload = function () {
+            ws = new WebSocket("ws://localhost:8080/Websocket/chat");
+
+            ws.onopen = function () {
+                console.log("WebSocket connection established.");
+            };
+
+            ws.onmessage = function (event) {
+                var messageContainer = document.getElementById("messages");
+                var newMessage = document.createElement("p");
+                newMessage.innerText = event.data;
+                messageContainer.appendChild(newMessage);
+                messageContainer.scrollTop = messageContainer.scrollHeight;  // Auto-scroll
+            };
+
+            ws.onclose = function () {
+                console.log("WebSocket connection closed.");
+            };
+
+            ws.onerror = function (error) {
+                console.error("WebSocket error:", error);
+            };
+        };
+
+        // Send a message to the WebSocket server
+        function sendMessage() {
+            var message = document.getElementById("input").value;
+            if (message) {
+                ws.send(message);
+                document.getElementById("input").value = ""; // Clear input
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>WebSocket Chat App</h1>
+    <div id="messages"></div>
+    <input type="text" id="input" placeholder="Type a message" />
+    <button onclick="sendMessage()">Send</button>
+</body>
+</html>
